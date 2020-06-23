@@ -1,6 +1,6 @@
 import React from 'react';
 import Node from './Node';
-import { get } from 'lodash';
+import { get, isEmpty } from 'lodash';
 
 const startNodeRow = 0;
 const startNodeCol = 1;
@@ -53,19 +53,26 @@ class Grid extends React.Component {
 				if (!visited.includes(node)) {
 					frontier.push(node); //  put into frontier array
                     visited.push(node); // visited[node] = true
-                    let copyGrid = [...this.state.grid]
-                    copyGrid[node.row][node.col].hasBeenVisited = true
-                    this.setState({grid: copyGrid})
 				}
 			}
 		}
-		console.log({ visited });
 
 		// start the traversal of visited array/ visualization
 		const interval = setInterval(() => {
+           if(!isEmpty(visited)){
             const cur = visited.shift()
-            console.log(cur, {visited})
-        }, 100);
+            if(cur.row === finishNodeRow && cur.col === finishNodeCol){
+                alert('Target node found!')
+                clearInterval(interval)
+            }
+            let copyCur = cur
+            copyCur.hasBeenVisited = true
+
+            let copyGrid = [...this.state.grid]
+            copyGrid[cur.row][cur.col] = copyCur
+            this.setState({copyGrid})
+           }
+        }, 50);
         setTimeout(() => {
             clearInterval(interval)
         }, 15000);
