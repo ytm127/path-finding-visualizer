@@ -2,10 +2,11 @@ import React from 'react';
 import Node from './Node';
 import { get, isEmpty } from 'lodash';
 
-const startNodeRow = 0;
-const startNodeCol = 1;
-const finishNodeRow = 8;
-const finishNodeCol = 9;
+const startNodeRow = 5;
+const startNodeCol = 5;
+const finishNodeRow = 14;
+const finishNodeCol = 12;
+const randomWalls = [[1,3],[5,3],[0,7],[3,3],[3,7],[2,7]]
 
 class Grid extends React.Component {
 	constructor(props) {
@@ -22,13 +23,14 @@ class Grid extends React.Component {
 		this.setState({ grid: grid });
 	}
 
-	visualizeBFS() {
+	visualizeBFS = async() => {
 		let frontier = [];
 		let visited = [];
+		let current = null
 		// returns an array of valid neighbors
 		const getNeighbors = (node) => {
 			let neighbors = [];
-			// check above
+            // check above
 			get(this.state.grid, `[${node.row - 1}][${node.col}]`) &&
 				neighbors.push(get(this.state.grid, `[${node.row - 1}][${node.col}]`));
 			// check below
@@ -44,38 +46,45 @@ class Grid extends React.Component {
 			return neighbors;
 		};
 
+		const sleep = (milliseconds) => {
+			return new Promise(resolve => setTimeout(resolve, milliseconds))
+		  }
+
+		// Breadth First Search 
 		let start = this.state.grid[startNodeRow][startNodeCol];
 		frontier.push(start);
-		while (frontier.length > 0) {
-			let current = frontier.shift();
+		let i = 0
+		const process = async () => {
+			current = frontier.shift();
+			let copyCur = current
+			copyCur.isFrontierNode = false
+			let copyGrid = [...this.state.grid]
+					copyGrid[copyCur.row][copyCur.col] = copyCur
+					this.setState({copyGrid})
+					console.log('new state set with', copyCur)
 			for (let node of getNeighbors(current)) {
 				// if node is not in visited
 				if (!visited.includes(node)) {
+					let copyNode = node
 					frontier.push(node); //  put into frontier array
-                    visited.push(node); // visited[node] = true
+					visited.push(node); // visited[node] = true
+					copyNode.isFrontierNode = true
+					copyNode.hasBeenVisited = true
+					let copyGrid = [...this.state.grid]
+					copyGrid[copyNode.row][copyNode.col] = copyNode
+					this.setState({copyGrid})
+					console.log('new state set with', copyNode)
 				}
+				console.log(frontier)
+				i+=1
 			}
 		}
 
-		// start the traversal of visited array/ visualization
-		const interval = setInterval(() => {
-           if(!isEmpty(visited)){
-            const cur = visited.shift()
-            if(cur.row === finishNodeRow && cur.col === finishNodeCol){
-                alert('Target node found!')
-                clearInterval(interval)
-            }
-            let copyCur = cur
-            copyCur.hasBeenVisited = true
-
-            let copyGrid = [...this.state.grid]
-            copyGrid[cur.row][cur.col] = copyCur
-            this.setState({copyGrid})
-           }
-        }, 50);
-        setTimeout(() => {
-            clearInterval(interval)
-        }, 15000);
+		// Run one interation per every 20 ms
+		while (frontier.length > 0) {
+			process()
+			await sleep(10)
+		}
 	}
 
 	render() {
@@ -87,12 +96,16 @@ class Grid extends React.Component {
 					return (
 						<div>
 							{row.map((cell, cellIdx) => {
+                                const wall = randomWalls.find(wallCell => {
+                                    return wallCell[0] === cell.row && wallCell[1] === cell.col
+                                })
 								return (
 									<Node
 										isStartNode={cell.isStartNode}
 										isFinishNode={cell.isFinishNode}
-                                        isFrontierNode={false}
+                                        isFrontierNode={cell.isFrontierNode}
                                         hasBeenVisited={cell.hasBeenVisited}
+                                        isWall={!!wall}
 									/>
 								);
 							})}
@@ -109,9 +122,9 @@ export default Grid;
 // Grid Utils
 const buildGrid = () => {
 	let grid = [];
-	for (let row = 0; row < 10; row++) {
+	for (let row = 0; row < 15; row++) {
 		let currentRow = [];
-		for (let col = 0; col < 10; col++) {
+		for (let col = 0; col < 15; col++) {
 			currentRow.push(nodeData(row, col));
 		}
 		grid.push(currentRow);
@@ -127,7 +140,8 @@ const nodeData = (row, col) => {
 		col: col,
 		isStartNode: row === startNodeRow && col === startNodeCol,
 		isFinishNode: row === finishNodeRow && col === finishNodeCol,
-		isFrontierNode: false,
+        isFrontierNode: false,
+        isWall: false,
 		hasBeenVisited: false,
 		value: Infinity
 	};

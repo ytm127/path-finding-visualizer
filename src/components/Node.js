@@ -2,10 +2,11 @@ import React from 'react';
 
 class Node extends React.Component {
 	render() {
-		const { isStartNode, isFinishNode, isFrontierNode, hasBeenVisited, value } = this.props;
+		const { isStartNode, isFinishNode, isFrontierNode, hasBeenVisited, value, isWall } = this.props;
 		const bg = () => {
 			if (isStartNode) return 'blue';
             if (isFinishNode) return 'red';
+            if(isWall) return 'black'
             if(isFrontierNode) return 'orange'
             if(hasBeenVisited) return 'lightgrey'
 		};
