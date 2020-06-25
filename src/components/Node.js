@@ -10,10 +10,10 @@ class Node extends React.Component {
 			if(isPath) return '#b5f558'
             if(isFrontierNode) return '#fcb6bf'
 			if(hasBeenVisited) return '#5592d9'
-			else return '#deeeff'
+			else return '#ededed'
 		};
 
-		return <div style={{ background: bg(), height: '3vw', width: '3vw', display: 'inline-block', border:'white solid thin' }}> &nbsp;</div>;
+		return <div style={{ background: bg(), height: '3vw', width: '3vw', display: 'inline-block', border:'none' }}> &nbsp;</div>;
 	}
 }
 
