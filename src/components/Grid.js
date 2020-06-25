@@ -2,14 +2,25 @@ import React from 'react';
 import Node from './Node';
 import { get, isEqual } from 'lodash';
 
-const startNodeRow = 5;
-const startNodeCol = 5;
-const finishNodeRow = 14;
-const finishNodeCol = 12;
-const randomWalls = [ [ 1, 3 ], [ 5, 3 ], [ 0, 7 ], [ 3, 3 ], [ 3, 7 ], [ 2, 7 ], [ 4, 7 ],[ 5, 7 ],[ 6, 7 ],[ 7, 7 ], [ 8, 7 ],[ 9, 7 ], [ 10, 8 ],[ 10, 9 ],[ 10, 10 ], [ 11, 7 ], [ 12, 7 ],[ 13, 7 ],[ 14, 7 ],[ 14, 8 ], [ 14, 9 ], [ 14, 11 ] ];
+const startNodeRow = getRandomInt(14);
+const startNodeCol = getRandomInt(14);
+const finishNodeRow = getRandomInt(14);
+const finishNodeCol = getRandomInt(14);
 
-	
 
+
+function getRandomInt(max) {
+	return Math.floor(Math.random() * Math.floor(max));
+  }
+
+  let walls = []
+for(let i =0; i<90; i++){
+	walls.push([getRandomInt(14), getRandomInt(14)])
+}
+
+
+const randomWalls = walls.filter(x => !isEqual(x, [finishNodeRow, finishNodeCol]))
+console.log(walls.length, randomWalls.length)
 
 class Grid extends React.Component {
 	constructor(props) {
@@ -34,23 +45,22 @@ class Grid extends React.Component {
 		const getNeighbors = (node) => {
 			let neighbors = [];
 			// check above
-			(get(this.state.grid, `[${node.row - 1}][${node.col}]`) &&
-				!get(this.state.grid, `[${node.row - 1}][${node.col}]`).isWall) &&
+			get(this.state.grid, `[${node.row - 1}][${node.col}]`) && 
+				!get(this.state.grid, `[${node.row - 1}][${node.col}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row - 1}][${node.col}]`));
 			// check below
-			(get(this.state.grid, `[${node.row + 1}][${node.col}]`) &&
-				!get(this.state.grid, `[${node.row + 1}][${node.col}]`).isWall) &&
+			get(this.state.grid, `[${node.row + 1}][${node.col}]`) && 
+				!get(this.state.grid, `[${node.row + 1}][${node.col}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row + 1}][${node.col}]`));
 			// check right
-			(get(this.state.grid, `[${node.row}][${node.col + 1}]`) &&
-				!get(this.state.grid, `[${node.row}][${node.col + 1}]`).isWall) &&
+			get(this.state.grid, `[${node.row}][${node.col + 1}]`) && 
+				!get(this.state.grid, `[${node.row}][${node.col + 1}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row}][${node.col + 1}]`));
 			// check left
-			(get(this.state.grid, `[${node.row}][${node.col - 1}]`) &&
-				!get(this.state.grid, `[${node.row}][${node.col - 1}]`).isWall) &&
+			get(this.state.grid, `[${node.row}][${node.col - 1}]`) && 
+				!get(this.state.grid, `[${node.row}][${node.col - 1}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row}][${node.col - 1}]`));
 			// return an array of neighbors
-			// console.log(neighbors);
 			return neighbors;
 		};
 
@@ -69,8 +79,8 @@ class Grid extends React.Component {
 			let copyGrid = [ ...this.state.grid ];
 			copyGrid[copyCur.row][copyCur.col] = copyCur;
 			this.setState({ copyGrid });
-			console.log({copyGrid})
 			for (let node of getNeighbors(current)) {
+				node.id === `row-${finishNodeRow}-col-${finishNodeCol}` && console.log('i should see this everytime if there is a path')
 				if (!cameFrom[node.id]) {
 					let copyNode = node;
 					frontier.push(node); //  put into frontier array
@@ -87,15 +97,20 @@ class Grid extends React.Component {
 		// Run one interation per every 10 ms
 		while (frontier.length > 0) {
 			process();
-			await sleep(10);
+			await sleep(.5);
 		}
 		// draw path
 		let path = [];
 		let backtrackCurrent = this.state.grid[finishNodeRow][finishNodeCol];
-		while (!isEqual(backtrackCurrent, this.state.grid[startNodeRow][startNodeCol])) {
+		while (backtrackCurrent && !isEqual(backtrackCurrent, this.state.grid[startNodeRow][startNodeCol])) { 
 			path.push(backtrackCurrent);
 			backtrackCurrent = cameFrom[backtrackCurrent.id];
+			if(!backtrackCurrent){
+				console.log('no path found')
+				return 
+			}
 		}
+
 		let copyState = [ ...this.state.grid ];
 		while (path.length !== 0) {
 			let temp = path.pop();
@@ -109,7 +124,7 @@ class Grid extends React.Component {
 		return (
 			<div>
 				<h2>Shortest Path</h2>
-				<button onClick={this.visualizeBFS}>Start BFS</button>
+				<br/>
 				{this.state.grid.map((row, idx) => {
 					return (
 						<div>
@@ -132,6 +147,8 @@ class Grid extends React.Component {
 						</div>
 					);
 				})}
+				<br/>
+				<button onClick={this.visualizeBFS}>Start BFS</button>
 			</div>
 		);
 	}
@@ -155,7 +172,7 @@ const buildGrid = () => {
 
 // object representing a Node
 const nodeData = (row, col) => {
-	const wall = randomWalls.find(x => isEqual([ row, col ], x));
+	const wall = randomWalls.find((x) => isEqual([ row, col ], x));
 	return {
 		id: `row-${row}-col-${col}`,
 		row: row,
