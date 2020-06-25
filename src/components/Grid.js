@@ -7,20 +7,17 @@ const startNodeCol = getRandomInt(14);
 const finishNodeRow = getRandomInt(14);
 const finishNodeCol = getRandomInt(14);
 
-
-
 function getRandomInt(max) {
 	return Math.floor(Math.random() * Math.floor(max));
-  }
-
-  let walls = []
-for(let i =0; i<90; i++){
-	walls.push([getRandomInt(14), getRandomInt(14)])
 }
 
+let walls = [];
+for (let i = 0; i < 90; i++) {
+	walls.push([ getRandomInt(14), getRandomInt(14) ]);
+}
 
-const randomWalls = walls.filter(x => !isEqual(x, [finishNodeRow, finishNodeCol]))
-console.log(walls.length, randomWalls.length)
+const randomWalls = walls.filter((x) => !isEqual(x, [ finishNodeRow, finishNodeCol ]));
+console.log(walls.length, randomWalls.length);
 
 class Grid extends React.Component {
 	constructor(props) {
@@ -45,19 +42,19 @@ class Grid extends React.Component {
 		const getNeighbors = (node) => {
 			let neighbors = [];
 			// check above
-			get(this.state.grid, `[${node.row - 1}][${node.col}]`) && 
+			get(this.state.grid, `[${node.row - 1}][${node.col}]`) &&
 				!get(this.state.grid, `[${node.row - 1}][${node.col}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row - 1}][${node.col}]`));
 			// check below
-			get(this.state.grid, `[${node.row + 1}][${node.col}]`) && 
+			get(this.state.grid, `[${node.row + 1}][${node.col}]`) &&
 				!get(this.state.grid, `[${node.row + 1}][${node.col}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row + 1}][${node.col}]`));
 			// check right
-			get(this.state.grid, `[${node.row}][${node.col + 1}]`) && 
+			get(this.state.grid, `[${node.row}][${node.col + 1}]`) &&
 				!get(this.state.grid, `[${node.row}][${node.col + 1}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row}][${node.col + 1}]`));
 			// check left
-			get(this.state.grid, `[${node.row}][${node.col - 1}]`) && 
+			get(this.state.grid, `[${node.row}][${node.col - 1}]`) &&
 				!get(this.state.grid, `[${node.row}][${node.col - 1}]`).isWall &&
 				neighbors.push(get(this.state.grid, `[${node.row}][${node.col - 1}]`));
 			// return an array of neighbors
@@ -67,6 +64,8 @@ class Grid extends React.Component {
 		const sleep = (milliseconds) => {
 			return new Promise((resolve) => setTimeout(resolve, milliseconds));
 		};
+
+		let foundEarly = false;
 
 		// Breadth First Search
 		let start = this.state.grid[startNodeRow][startNodeCol];
@@ -80,7 +79,8 @@ class Grid extends React.Component {
 			copyGrid[copyCur.row][copyCur.col] = copyCur;
 			this.setState({ copyGrid });
 			for (let node of getNeighbors(current)) {
-				node.id === `row-${finishNodeRow}-col-${finishNodeCol}` && console.log('i should see this everytime if there is a path')
+				node.id === `row-${finishNodeRow}-col-${finishNodeCol}` &&
+					console.log('i should see this everytime if there is a path');
 				if (!cameFrom[node.id]) {
 					let copyNode = node;
 					frontier.push(node); //  put into frontier array
@@ -90,24 +90,25 @@ class Grid extends React.Component {
 					let copyGrid = [ ...this.state.grid ];
 					copyGrid[copyNode.row][copyNode.col] = copyNode;
 					this.setState({ copyGrid });
+					if (copyNode.id === `row-${finishNodeRow}-col-${finishNodeCol}`) foundEarly = true;
 				}
 			}
 		};
 
 		// Run one interation per every 10 ms
-		while (frontier.length > 0) {
+		while (frontier.length > 0 && !foundEarly) {
 			process();
-			await sleep(.5);
+			await sleep(0.5);
 		}
 		// draw path
 		let path = [];
 		let backtrackCurrent = this.state.grid[finishNodeRow][finishNodeCol];
-		while (backtrackCurrent && !isEqual(backtrackCurrent, this.state.grid[startNodeRow][startNodeCol])) { 
+		while (backtrackCurrent && !isEqual(backtrackCurrent, this.state.grid[startNodeRow][startNodeCol])) {
 			path.push(backtrackCurrent);
 			backtrackCurrent = cameFrom[backtrackCurrent.id];
-			if(!backtrackCurrent){
-				console.log('no path found')
-				return 
+			if (!backtrackCurrent) {
+				console.log('no path found');
+				return;
 			}
 		}
 
@@ -124,7 +125,7 @@ class Grid extends React.Component {
 		return (
 			<div>
 				<h2>Shortest Path</h2>
-				<br/>
+				<br />
 				{this.state.grid.map((row, idx) => {
 					return (
 						<div>
@@ -147,7 +148,7 @@ class Grid extends React.Component {
 						</div>
 					);
 				})}
-				<br/>
+				<br />
 				<button onClick={this.visualizeBFS}>Start BFS</button>
 			</div>
 		);
