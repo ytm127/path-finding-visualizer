@@ -7,7 +7,7 @@ function App() {
 		<div className="App">
 			<br />
 	<div className="container" style={{padding:'5vw', paddingTop:'1vh'}}>
-  <h1>GRAPH TRAVERSAL ALGORITHMS</h1>
+  <h1>PATH FINDING VISUALIZER</h1>
 			<div className="pure-g" style={{ margin: 10 }}>
 				<div className="pure-u-1-6">
 					<p

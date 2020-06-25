@@ -205,13 +205,108 @@ class Grid extends React.Component {
 		this.setState({ copyState });
 	};
 
+	visualizeAstar = async () => {
+		let frontier = [];
+		let cameFrom = {};
+		let queue = {};
+		let current = null;
+		// returns an array of valid neighbors
+		const getNeighbors = (node) => {
+			let neighbors = [];
+			// check above
+			get(this.state.grid, `[${node.row - 1}][${node.col}]`) &&
+				!get(this.state.grid, `[${node.row - 1}][${node.col}]`).isWall &&
+				neighbors.push(get(this.state.grid, `[${node.row - 1}][${node.col}]`));
+			// check below
+			get(this.state.grid, `[${node.row + 1}][${node.col}]`) &&
+				!get(this.state.grid, `[${node.row + 1}][${node.col}]`).isWall &&
+				neighbors.push(get(this.state.grid, `[${node.row + 1}][${node.col}]`));
+			// check right
+			get(this.state.grid, `[${node.row}][${node.col + 1}]`) &&
+				!get(this.state.grid, `[${node.row}][${node.col + 1}]`).isWall &&
+				neighbors.push(get(this.state.grid, `[${node.row}][${node.col + 1}]`));
+			// check left
+			get(this.state.grid, `[${node.row}][${node.col - 1}]`) &&
+				!get(this.state.grid, `[${node.row}][${node.col - 1}]`).isWall &&
+				neighbors.push(get(this.state.grid, `[${node.row}][${node.col - 1}]`));
+			// return an array of neighbors
+			return neighbors;
+		};
+
+		const sleep = (milliseconds) => {
+			return new Promise((resolve) => setTimeout(resolve, milliseconds));
+		};
+
+		const heuristic = (finish , cur) => {
+			console.log({cur})
+			// Manhattan distance on a square grid
+			return Math.abs(finish.row - cur.row) + Math.abs(finish.col - cur.col);
+		};
+
+
+		let foundEarly = false;
+
+		// A* star search
+		let start = this.state.grid[startNodeRow][startNodeCol];
+		frontier.push(start);
+		cameFrom[start.id] = null;
+		const process = async () => {
+			frontier.sort((x, y) => x.value - y.value);
+			current = frontier.shift();
+			let copyCur = current;
+			copyCur.isFrontierNode = false;
+			let copyGrid = [ ...this.state.grid ];
+			copyGrid[copyCur.row][copyCur.col] = copyCur;
+			this.setState({ copyGrid });
+			for (let node of getNeighbors(current)) {
+				if (!cameFrom[node.id]) {
+						let copyNode = node;
+						frontier.push(node); //  put into frontier array
+						cameFrom[node.id] = current; // visited[node] = true
+						copyNode.isFrontierNode = true;
+						copyNode.hasBeenVisited = true;
+						copyNode.value = heuristic(this.state.grid[finishNodeRow][finishNodeCol], copyNode); // update value
+						let copyGrid = [ ...this.state.grid ];
+						copyGrid[copyNode.row][copyNode.col] = copyNode;
+						this.setState({ copyGrid });
+						if (copyNode.id === `row-${finishNodeRow}-col-${finishNodeCol}`) foundEarly = true; // early exit
+				}
+			}
+		};
+
+		// Run one interation per every 10 ms
+		while (frontier.length > 0 && !foundEarly) {
+			process();
+			await sleep(0.5);
+		}
+		// draw path
+		let path = [];
+		let backtrackCurrent = this.state.grid[finishNodeRow][finishNodeCol];
+		while (backtrackCurrent && !isEqual(backtrackCurrent, this.state.grid[startNodeRow][startNodeCol])) {
+			path.push(backtrackCurrent);
+			backtrackCurrent = cameFrom[backtrackCurrent.id];
+			if (!backtrackCurrent) {
+				console.log('no path found');
+				return;
+			}
+		}
+
+		let copyState = [ ...this.state.grid ];
+		while (path.length !== 0) {
+			let temp = path.pop();
+			copyState[temp.row][temp.col].isPath = true;
+		}
+
+		this.setState({ copyState });
+	};
+
 	render() {
 		return (
 			<div>
 				<br />
 				{this.state.grid.map((row, idx) => {
 					return (
-						<div style={{height:'2vw'}}>
+						<div style={{ height: '2vw' }}>
 							{row.map((cell, cellIdx) => {
 								const wall = randomWalls.find((wallCell) => {
 									return wallCell[0] === cell.row && wallCell[1] === cell.col;
@@ -232,8 +327,15 @@ class Grid extends React.Component {
 					);
 				})}
 				<br />
-				<button className='button-xlarge pure-button' style={{margin:10}} onClick={this.visualizeBFS}>BFS</button>
-				<button className='button-xlarge pure-button' style={{margin:10}}  onClick={this.visualizeDFS}>DFS</button>
+				<button className="button-xlarge pure-button" style={{ margin: 10 }} onClick={this.visualizeBFS}>
+					BFS
+				</button>
+				<button className="button-xlarge pure-button" style={{ margin: 10 }} onClick={this.visualizeDFS}>
+					DFS
+				</button>
+				<button className="button-xlarge pure-button" style={{ margin: 10 }} onClick={this.visualizeAstar}>
+					AStar
+				</button>
 			</div>
 		);
 	}
@@ -241,8 +343,7 @@ class Grid extends React.Component {
 
 export default Grid;
 
-
-// TODO - Put both into different files 
+// TODO - Put both into different files
 // Grid Utils
 const buildGrid = () => {
 	let grid = [];
@@ -270,6 +371,6 @@ const nodeData = (row, col) => {
 		isWall: wall,
 		isPath: false,
 		hasBeenVisited: false,
-		value: Infinity
+		value: row === startNodeRow && col === startNodeCol ? 0 : Infinity
 	};
 };
