@@ -6,7 +6,8 @@ function App() {
 	return (
 		<div className="App">
 			<br />
-			<h1>GRAPH TRAVERSAL ALGORITHMS</h1>
+	<div className="container" style={{padding:'5vw', paddingTop:'1vh'}}>
+  <h1>GRAPH TRAVERSAL ALGORITHMS</h1>
 			<div className="pure-g" style={{ margin: 10 }}>
 				<div className="pure-u-1-6">
 					<p
@@ -101,6 +102,7 @@ function App() {
 			</div>
 			<hr/>
       <Grid />
+  </div>
 		</div>
 	);
 }

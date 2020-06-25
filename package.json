@@ -1,5 +1,5 @@
 {
-	"homepage": "http://ytm127.github.io/ytm127/path-finding-visualizer",
+	"homepage": "http://ytm127.github.io/path-finding-visualizer",
 	"name": "graph-search",
 	"version": "0.1.0",
 	"private": true,
