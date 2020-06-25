@@ -300,6 +300,11 @@ class Grid extends React.Component {
 		this.setState({ copyState });
 	};
 
+	resetTraversal = () => {
+		let grid = buildGrid();
+		this.setState({ grid: grid });
+	}
+
 	render() {
 		return (
 			<div>
@@ -336,6 +341,11 @@ class Grid extends React.Component {
 				<button className="button-xlarge pure-button" style={{ margin: 10 }} onClick={this.visualizeAstar}>
 					AStar
 				</button>
+				<div>
+				<button className="button-xlarge pure-button" style={{ margin: 10 }} onClick={this.resetTraversal}>
+					Reset Traversal
+				</button>
+				</div>
 			</div>
 		);
 	}
