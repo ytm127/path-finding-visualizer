@@ -23,7 +23,9 @@ class Grid extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			grid: []
+			grid: [],
+			isScanning: false,
+			pathDoesExist: true
 		};
 		this.visualizeBFS = this.visualizeBFS.bind(this);
 		this.visualizeDFS = this.visualizeDFS.bind(this);
@@ -96,6 +98,7 @@ class Grid extends React.Component {
 
 		// Run one interation per every 10 ms
 		while (frontier.length > 0 && !foundEarly) {
+			this.setState({isScanning: true})
 			process();
 			await sleep(0.5);
 		}
@@ -106,10 +109,13 @@ class Grid extends React.Component {
 			path.push(backtrackCurrent);
 			backtrackCurrent = cameFrom[backtrackCurrent.id];
 			if (!backtrackCurrent) {
+				this.setState({isScanning: false})
 				console.log('no path found');
+				this.setState({pathDoesExist: false})
 				return;
 			}
 		}
+		this.setState({isScanning: false})
 
 		let copyState = [ ...this.state.grid ];
 		while (path.length !== 0) {
@@ -181,6 +187,7 @@ class Grid extends React.Component {
 
 		// Run one interation per every 10 ms
 		while (frontier.length > 0 && !foundEarly) {
+			this.setState({isScanning: true})
 			process();
 			await sleep(0.5);
 		}
@@ -192,9 +199,12 @@ class Grid extends React.Component {
 			backtrackCurrent = cameFrom[backtrackCurrent.id];
 			if (!backtrackCurrent) {
 				console.log('no path found');
+				this.setState({pathDoesExist: false})
+				this.setState({isScanning: false})
 				return;
 			}
 		}
+		this.setState({isScanning: false})
 
 		let copyState = [ ...this.state.grid ];
 		while (path.length !== 0) {
@@ -238,7 +248,6 @@ class Grid extends React.Component {
 		};
 
 		const heuristic = (finish , cur) => {
-			console.log({cur})
 			// Manhattan distance on a square grid
 			return Math.abs(finish.row - cur.row) + Math.abs(finish.col - cur.col);
 		};
@@ -276,6 +285,7 @@ class Grid extends React.Component {
 
 		// Run one interation per every 10 ms
 		while (frontier.length > 0 && !foundEarly) {
+			this.setState({isScanning: true})
 			process();
 			await sleep(0.5);
 		}
@@ -286,10 +296,14 @@ class Grid extends React.Component {
 			path.push(backtrackCurrent);
 			backtrackCurrent = cameFrom[backtrackCurrent.id];
 			if (!backtrackCurrent) {
+				this.setState({isScanning: false})
 				console.log('no path found');
+				this.setState({pathDoesExist: false})
 				return;
 			}
 		}
+
+		this.setState({isScanning: false})
 
 		let copyState = [ ...this.state.grid ];
 		while (path.length !== 0) {
@@ -343,8 +357,10 @@ class Grid extends React.Component {
 				</button>
 				<div>
 				<button className="button-xlarge pure-button" style={{ margin: 10 }} onClick={this.resetTraversal}>
-					Reset Traversal
+					<strong>Reset Traversal</strong>
 				</button>
+				{this.state.isScanning && 'Scanning...'}
+				{!this.state.pathDoesExist && 'Path does not exist :('}
 				</div>
 			</div>
 		);
