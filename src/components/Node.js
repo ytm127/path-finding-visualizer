@@ -2,7 +2,7 @@ import React from 'react';
 
 class Node extends React.Component {
 	render() {
-		const { isStartNode, isFinishNode, isFrontierNode, hasBeenVisited, isPath, isWall } = this.props;
+		const { isStartNode, isFinishNode, isFrontierNode, hasBeenVisited, isPath, isWall, nodeSize } = this.props;
 		const bg = () => {
 			if (isStartNode) return '#5b58f5';
             if (isFinishNode) return '#ff5757';
@@ -13,7 +13,7 @@ class Node extends React.Component {
 			else return '#ededed'
 		};
 
-		return <div style={{ background: bg(), height: '2.5vw', width: '2.5vw', display: 'inline-block', border:'none' }}> &nbsp;</div>;
+		return <div style={{ background: bg(), height: nodeSize, width: nodeSize, display: 'inline-block', border:'none' }}> &nbsp;</div>;
 	}
 }
 

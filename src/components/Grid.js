@@ -314,10 +314,26 @@ class Grid extends React.Component {
 		this.setState({ copyState });
 	};
 
+	// Reset button
 	resetTraversal = () => {
 		let grid = buildGrid();
 		this.setState({ grid: grid , pathDoesExist: true});
 	}
+
+
+	// TODO: move this styles logic into styled-component. styles logic doesnt belong here
+	getNodeSize = () => {
+		// if(this.props.screenDimensions.width >= 1100) return '3.5vw'
+		// if(this.props.screenDimensions.width <= 1100) return '3.5vw'
+		// if(this.props.screenDimensions.width <= 600) return '2.5vw'
+		return '3.5vw'
+	}
+	
+
+	resetAll = () => {
+		window.location.reload(false);
+	}
+
 
 	render() {
 		return (
@@ -325,7 +341,7 @@ class Grid extends React.Component {
 				<br />
 				{this.state.grid.map((row, idx) => {
 					return (
-						<div style={{ height: '2.5vw' }}> 
+						<div style={{ height: this.getNodeSize() }}> 
 							{row.map((cell, cellIdx) => {
 								const wall = randomWalls.find((wallCell) => {
 									return wallCell[0] === cell.row && wallCell[1] === cell.col;
@@ -339,6 +355,7 @@ class Grid extends React.Component {
 										hasBeenVisited={cell.hasBeenVisited}
 										isWall={!!wall}
 										isPath={cell.isPath}
+										nodeSize={this.getNodeSize()}
 									/>
 								);
 							})}
@@ -356,6 +373,7 @@ class Grid extends React.Component {
 					AStar
 				</button>
 				<div>
+					<button className='pure-button' onClick={this.resetAll}><img style={{height:20, width:20}} src="https://img.icons8.com/windows/32/000000/refresh.png"/></button>
 				<button className="button-xlarge pure-button" style={{ margin: 10 }} onClick={this.resetTraversal}>
 					<strong>Reset Traversal</strong>
 				</button>
@@ -363,7 +381,7 @@ class Grid extends React.Component {
 				{!this.state.pathDoesExist && 'Path does not exist :('}
 				</div>
 			</div>
-		);
+		);	
 	}
 }
 
