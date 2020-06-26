@@ -316,7 +316,7 @@ class Grid extends React.Component {
 
 	resetTraversal = () => {
 		let grid = buildGrid();
-		this.setState({ grid: grid });
+		this.setState({ grid: grid , pathDoesExist: true});
 	}
 
 	render() {
