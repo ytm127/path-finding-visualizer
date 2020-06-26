@@ -13,7 +13,7 @@ class Node extends React.Component {
 			else return '#ededed'
 		};
 
-		return <div style={{ background: bg(), height: '2vw', width: '2vw', display: 'inline-block', border:'none' }}> &nbsp;</div>;
+		return <div style={{ background: bg(), height: '2.5vw', width: '2.5vw', display: 'inline-block', border:'none' }}> &nbsp;</div>;
 	}
 }
 

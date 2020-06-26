@@ -311,7 +311,7 @@ class Grid extends React.Component {
 				<br />
 				{this.state.grid.map((row, idx) => {
 					return (
-						<div style={{ height: '2vw' }}>
+						<div style={{ height: '2.5vw' }}> 
 							{row.map((cell, cellIdx) => {
 								const wall = randomWalls.find((wallCell) => {
 									return wallCell[0] === cell.row && wallCell[1] === cell.col;
