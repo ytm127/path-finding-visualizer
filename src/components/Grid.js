@@ -323,10 +323,8 @@ class Grid extends React.Component {
 
 	// TODO: move this styles logic into styled-component. styles logic doesnt belong here
 	getNodeSize = () => {
-		// if(this.props.screenDimensions.width >= 1100) return '3.5vw'
-		// if(this.props.screenDimensions.width <= 1100) return '3.5vw'
-		// if(this.props.screenDimensions.width <= 600) return '2.5vw'
-		return '3.5vw'
+		if(this.props.screenDimensions.width >= 1100) return '2vw'
+		else return '3.5vw'
 	}
 	
 
