@@ -1,16 +1,17 @@
 import React from 'react';
+import {colors} from '../styles'
 
 class Node extends React.Component {
 	render() {
 		const { isStartNode, isFinishNode, isFrontierNode, hasBeenVisited, isPath, isWall, nodeSize } = this.props;
 		const bg = () => {
-			if (isStartNode) return '#5b58f5';
-            if (isFinishNode) return '#ff5757';
-			if(isWall) return '#6e6e6e'
-			if(isPath) return '#b5f558'
-            if(isFrontierNode) return '#fcb6bf'
-			if(hasBeenVisited) return '#5592d9'
-			else return '#ededed'
+			if (isStartNode) return colors.isStartNode;
+            if (isFinishNode) return colors.isFinishNode;
+			if(isWall) return colors.isWall
+			if(isPath) return colors.isPath
+            if(isFrontierNode) return colors.isFrontierNode
+			if(hasBeenVisited) return colors.hasBeenVisited
+			else return colors.default
 		};
 
 		return <div style={{ background: bg(), height: nodeSize, width: nodeSize, display: 'inline-block', border:'none' }}> &nbsp;</div>;
