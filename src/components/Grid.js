@@ -21,7 +21,7 @@ class Grid extends React.Component {
 		this.setState({ grid: grid });
 	}
 
-	visualizeBFS = async (grid) => {
+	visualizeBFS = async () => {
 		let frontier = [];
 		let cameFrom = {};
 		let current = null;
